@@ -18,37 +18,45 @@ MAX_SAMPLES = int(SAMPLES_PER_DAY * DATA_RETENTION_DAYS)  # Total points to stor
 
 # Pattern validation hyperparameters
 
-# Ratio of cup width to handle width (time-wise)
-CUP_WIDTH_MIN_RATIO = 0.10   # At least 10% of available points
-CUP_WIDTH_MAX_RATIO = 0.65   # At most 65% of available points
-HANDLE_WIDTH_MIN = 5  # At least 5 bars (25 minutes)
-HANDLE_WIDTH_MAX_RATIO = 0.5  # Max 50% of cup width
+# Width of the cup relative to total samples
+CUP_WIDTH_MIN_RATIO = 0.085    # Between 0.07 and 0.10
+CUP_WIDTH_MAX_RATIO = 0.70     # Between 0.65 and 0.75
 
-CUP_HANDLE_WIDTH_RATIO = 2
+# Handle width constraints
+HANDLE_WIDTH_MIN = 4           # Between 3 and 5 bars
+HANDLE_WIDTH_MAX_RATIO = 0.6   # Between 0.5 and 0.7
 
-# Minimum ratio between handle and cup depth
-HANDLE_DEPTH_RATIO_MIN = 0.1
-HANDLE_DEPTH_RATIO_MAX = 0.33
+# Cup-to-handle width ratio
+CUP_HANDLE_WIDTH_RATIO = 1.75  # Between 1.5 and 2
 
-# Where the cup's minimum should lie between the rims (as a fraction of width)
-CUP_MIN_POSITION_MIN = 0.2
-CUP_MIN_POSITION_MAX = 0.8
+# Handle depth relative to cup depth
+HANDLE_DEPTH_RATIO_MIN = 0.075  # Between 0.05 and 0.1
+HANDLE_DEPTH_RATIO_MAX = 0.4    # Between 0.33 and 0.5
 
-# Peak control within cup and handle
-MAX_CUP_PEAK_ABOVE_RIM = 0.02               # 2% above average rim height in cup
-MAX_HANDLE_PEAK_OVER_CEILING = 0.02         # 2% above handle ceiling (right rim + current)
+# Cup minimum relative position between rims
+CUP_MIN_POSITION_MIN = 0.15    # Between 0.1 and 0.2
+CUP_MIN_POSITION_MAX = 0.85    # Between 0.8 and 0.9
 
-# Minimum absolute depth requirements
-MIN_CUP_DEPTH = 0.1                       # 0.5% dip from rim average
-MAX_CUP_DEPTH = 0.50
-MIN_HANDLE_DEPTH = 0.005                   # 0.5% dip from handle ceiling
+# Spike control: limits on extreme peaks within segments
+MAX_CUP_PEAK_ABOVE_RIM = 0.025        # Between 0.02 and 0.03
+MAX_HANDLE_PEAK_OVER_CEILING = 0.025  # Between 0.02 and 0.03
 
-# Structural checks for relative placement
-MIN_LEFT_RIM_ABOVE_HANDLE_MIN = 0.002       # Left rim must be at least 0.2% above handle min
-MAX_RIGHT_RIM_DROP_FROM_LEFT = 0.03      # Right rim can be max 3% below left rim
-MAX_RIGHT_RIM_ABOVE_LEFT = 0.05  # Right rim must be no more than 5% above left rim
+# Cup depth ratio (absolute)
+MIN_CUP_DEPTH = 0.075          # Between 0.05 and 0.1
+MAX_CUP_DEPTH = 0.55           # Between 0.5 and 0.6
 
-BREAKOUT_TOLERANCE = 0.01  # Current price must be ≥ 99% of right rim
-LEFT_RIGHT_RIM_HEIGHT_TOLERANCE = 0.05  # 5% tolerance
+# Handle dip (absolute)
+MIN_HANDLE_DEPTH = 0.0035      # Between 0.002 and 0.005
+
+# Structural placement constraints
+MIN_LEFT_RIM_ABOVE_HANDLE_MIN = 0.0015   # Between 0.001 and 0.002
+MAX_RIGHT_RIM_DROP_FROM_LEFT = 0.04      # Between 0.03 and 0.05
+MAX_RIGHT_RIM_ABOVE_LEFT = 0.06          # Between 0.05 and 0.07
+
+# Breakout validation
+BREAKOUT_TOLERANCE = 0.015      # Between 0.01 and 0.02
+
+# Tolerance for height similarity between left and right rims
+LEFT_RIGHT_RIM_HEIGHT_TOLERANCE = 0.06  # Between 0.05 and 0.07
 
 
