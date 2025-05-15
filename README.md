@@ -1,3 +1,6 @@
+
+# Stock Pattern Detection POC
+
 # Project Description
 
 This project is a local proof-of-concept (POC) stock tracker and recommendation system. It collects real-time stock prices for seven major companies, stores the data, and analyzes it to detect the classic "cup and handle" technical pattern. The application runs locally, includes an automated scheduler, and exposes an interactive API for pattern detection and debugging.
@@ -5,12 +8,6 @@ This project is a local proof-of-concept (POC) stock tracker and recommendation 
 The README includes full setup instructions, API usage examples, expected responses, troubleshooting tips, and even visual examples of detected patterns.
 
 For any questions, issues, or feedback, please contact Assaf Zimand via GitHub or email - assafzimand@gmail.com
-
-## Setup
-
-Instructions on setting up the project will be added here. 
-
-# 🚀 Stock Pattern Detection POC
 
 ## 🧰 Setup Instructions
 
