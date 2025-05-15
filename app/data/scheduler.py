@@ -60,5 +60,9 @@ def start_scheduler():
     atexit.register(stop_scheduler)
 
 def stop_scheduler():
-    scheduler.shutdown()
-    print("[INFO] Scheduler stopped.")
+    if scheduler.running:
+        scheduler.shutdown()
+        print("[INFO] Scheduler stopped.")
+    else:
+        print("[INFO] Scheduler was not running.")
+

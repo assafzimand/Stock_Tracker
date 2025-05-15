@@ -27,6 +27,9 @@ from ..config.constants import (
 )
 from ..data.storage import get_prices
 
+import base64
+from io import BytesIO
+from app.analysis.plotting import plot_prices
 
 def get_symbol(company: str) -> str:
     reverse_lookup = {v: k for k, v in STOCK_SYMBOLS.items()}
@@ -197,9 +200,9 @@ def detect_cup_and_handle(company: str):
         "pattern_detected": False
     }
 
-    if df.empty or 'price' not in df.columns:
-        print(f"[DEBUG] {company}: No price data available.")
-        return False, result_info
+    if df.empty or len(df) < 5 or 'price' not in df.columns:
+        print(f"[Error] As for now, There is not enough data to analyze a pattern for company: {company}")
+        raise ValueError(f"As for now, There is not enough data to analyze a pattern for company: {company}")
 
     prices = df['price']
     timestamps = df['timestamp']
@@ -234,3 +237,22 @@ def detect_cup_and_handle(company: str):
                 return True, result_info
 
         start_idx = right_rim_idx - 1  # move to the next older right rim
+
+
+def detect_cup_and_handle_wrapper(company: str, include_plot: bool = False):
+    result, pattern_points = detect_cup_and_handle(company)
+
+    plot_b64 = None
+    if include_plot:
+        fig = plot_prices(
+            company,
+            title=f"{company} - Pattern Detected: {pattern_points.get('pattern_detected', False)}",
+            pattern_points=pattern_points
+        )
+        buf = BytesIO()
+        fig.savefig(buf, format="png")
+        buf.seek(0)
+        plot_b64 = base64.b64encode(buf.read()).decode("utf-8")
+        buf.close()
+
+    return result, plot_b64

@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 
 from .preprocessing import smooth_prices
-from ..config.constants import STOCK_SYMBOLS, DATA_RETENTION_DAYS
+from ..config.constants import DATA_RETENTION_DAYS
 from ..data.storage import get_prices
 
 
