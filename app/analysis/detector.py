@@ -217,7 +217,7 @@ def detect_cup_and_handle(company: str):
         right_rim_idx = find_next_right_rim(smoothed, current_value, start=start_idx)
         if right_rim_idx is None:
             print(f"[DEBUG] {company}: No valid right rim candidate formed a complete pattern.")
-            return False, result_info
+            return False, result_info, df
 
         result_info["right_rim"] = timestamps.iloc[right_rim_idx]
 
@@ -234,21 +234,26 @@ def detect_cup_and_handle(company: str):
                 result_info["right_min"] = timestamps.loc[pattern_data["right_min_idx"]]
                 print(f"[INFO] {company}: Pattern detected.")
                 result_info["pattern_detected"] = True
-                return True, result_info
+                return True, result_info, df
 
         start_idx = right_rim_idx - 1  # move to the next older right rim
 
 
 def detect_cup_and_handle_wrapper(company: str, include_plot: bool = False):
-    result, pattern_points = detect_cup_and_handle(company)
+    result, pattern_points, prices = detect_cup_and_handle(company)
 
     plot_b64 = None
     if include_plot:
         fig = plot_prices(
             company,
+            prices= prices,
             title=f"{company} - Pattern Detected: {pattern_points.get('pattern_detected', False)}",
             pattern_points=pattern_points
         )
+        if fig is None:
+            print(f"[ERROR] No plot generated for {company} — no data available.")
+            raise ValueError(f"As for now, there is not enough data to generate a plot for company: {company}")
+
         buf = BytesIO()
         fig.savefig(buf, format="png")
         buf.seek(0)

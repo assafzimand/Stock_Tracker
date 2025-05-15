@@ -41,7 +41,7 @@ def test_detect_random_company():
     companies = list(STOCK_SYMBOLS.values())
     
     for company in companies: # [12, 14, 27, 28, 50, 52, 85]:
-        result, pattern_points = detect_cup_and_handle(company)
+        result, pattern_points, prices = detect_cup_and_handle(company)
 
         print(f"Pattern detected for {company}: {result}")
         
@@ -54,6 +54,7 @@ def test_detect_random_company():
         # Save plot to PNG file
         fig = plot_prices(
             company,
+            prices=prices,
             title=f"{company} - Pattern Detected: {pattern_points.get('pattern_detected', False)}",
             pattern_points=pattern_points
         )

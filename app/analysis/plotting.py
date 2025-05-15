@@ -25,33 +25,21 @@ def auto_adjust_params(prices: pd.Series) -> tuple:
     return smoothing_window
 
 
-def plot_prices(company: str, title: str = None, pattern_points: dict = None) -> [plt.Figure]:
+def plot_prices(company: str, prices: pd.DataFrame, title: str = None, pattern_points: dict = None) -> [plt.Figure]:
     """
     Plots the price data for a given company over the last N days.
     Pattern overlay is colored: green if detected, red if not.
 
-    Args:
-        company (str): Company name
-        title (str): Plot title
-        pattern_points (dict): Includes pattern timestamps + 'pattern_detected': bool
-
     Returns:
         matplotlib Figure or None if no data
     """
-    # Resolve symbol
-    symbol = company  # Simplified if company == symbol
-
-    # Time window
-    to_ts = datetime.utcnow()
-    from_ts = to_ts - timedelta(days=DATA_RETENTION_DAYS)
-
-    prices = get_prices(symbol, from_ts, to_ts)
     if prices.empty or "price" not in prices.columns:
-        print(f"No data to plot for {company}.")
+        print(f"[ERROR] No data to plot for {company}.")
         return None
 
     smoothing_window = auto_adjust_params(prices["price"])
     series = smooth_prices(prices["price"], window=smoothing_window)
+    series = series.reindex(prices.index)  # Ensure alignment
 
     plt.figure(figsize=(12, 6))
     plt.plot(prices["timestamp"], prices["price"],
@@ -61,6 +49,8 @@ def plot_prices(company: str, title: str = None, pattern_points: dict = None) ->
 
     # Overlay pattern if available
     if pattern_points:
+        print(f"[DEBUG] Pattern points for {company}: {pattern_points}")
+
         key_order = ["left_rim", "left_min", "right_rim", "right_min", "current"]
         overlay_x = []
         overlay_y = []
@@ -70,10 +60,18 @@ def plot_prices(company: str, title: str = None, pattern_points: dict = None) ->
             ts = pattern_points.get(key)
             if ts is None:
                 continue
+
+            print(f"[DEBUG] Matching timestamp: {ts}")
             closest_idx = prices["timestamp"].sub(ts).abs().idxmin()
+
             if closest_idx in seen_idxs:
                 continue
             seen_idxs.add(closest_idx)
+
+            if closest_idx not in series.index:
+                print(f"[ERROR] Index mismatch: {closest_idx} not in smoothed series index")
+                continue
+
             overlay_x.append(prices["timestamp"].loc[closest_idx])
             overlay_y.append(series.loc[closest_idx])
 

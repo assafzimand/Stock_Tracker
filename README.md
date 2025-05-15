@@ -1,6 +1,10 @@
 # Project Description
 
-This project is a stock tracker application that includes data fetching, pattern detection, and API route definitions. The application is structured to separate core logic, data models, utilities, and configuration.
+This project is a local proof-of-concept (POC) stock tracker and recommendation system. It collects real-time stock prices for seven major companies, stores the data, and analyzes it to detect the classic "cup and handle" technical pattern. The application runs locally, includes an automated scheduler, and exposes an interactive API for pattern detection and debugging.
+
+The README includes full setup instructions, API usage examples, expected responses, troubleshooting tips, and even visual examples of detected patterns.
+
+For any questions, issues, or feedback, please contact Assaf Zimand via GitHub or email - assafzimand@gmail.com
 
 ## Setup
 
@@ -75,6 +79,29 @@ Use the `/detect-pattern` endpoint to check for a **cup and handle** pattern.
   "plot_base64": "iVBORw0KGgoAAAANSUhEUgAA..."
 }
 ```
+## 🖼️ How to View the Plot
+
+If `include_plot` is set to `true`, the response will contain a `plot_base64` string.  
+This is an image encoded in base64 format (PNG).
+
+### To view it:
+
+#### Option 1: Use an online viewer
+1. Copy the `plot_base64` string from the response
+2. Go to a site like https://codebeautify.org/base64-to-image-converter
+3. Paste it into the input box
+4. Click **View** or **Convert**
+
+#### Option 2: Programmatically decode it (Python)
+```python
+import base64
+
+b64_str = "your_base64_string_here"
+with open("plot.png", "wb") as f:
+    f.write(base64.b64decode(b64_str))
+```
+
+This saves the plot as `plot.png` on your machine.
 
 ---
 
