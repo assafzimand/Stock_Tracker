@@ -5,7 +5,6 @@ from typing import Dict
 
 from app.config.constants import (
     STOCK_SYMBOLS,
-    MAX_SAMPLES,
     DATA_RETENTION_DAYS
 )
 
@@ -14,7 +13,7 @@ DATA_FILE = os.path.join(os.path.dirname(__file__), "stock_data.csv")
 COLUMNS = ["timestamp", "symbol", "price"]
 
 # === Global in-memory store ===
-_data: pd.DataFrame = pd.DataFrame(columns=COLUMNS)
+_data: pd.DataFrame = None
 
 
 def make_new_file_if_needed():
@@ -27,20 +26,6 @@ def make_new_file_if_needed():
         empty_df.to_csv(DATA_FILE, index=False)
 
 
-def load_existing_data_if_available():
-    """
-    Loads existing data into memory from the persistent file and trims old rows.
-    """
-    global _data
-    if os.path.exists(DATA_FILE):
-        _data = pd.read_csv(DATA_FILE, parse_dates=["timestamp"])
-        print(f"[INFO] Loaded existing data: {_data.shape[0]} rows from {DATA_FILE}")
-        delete_old_prices()
-    else:
-        make_new_file_if_needed()
-
-
-
 def delete_old_prices():
     """
     Truncates data older than the retention period (e.g., 3 days) from memory.
@@ -48,6 +33,22 @@ def delete_old_prices():
     global _data
     cutoff_time = datetime.utcnow() - timedelta(days=DATA_RETENTION_DAYS)
     _data = _data[_data["timestamp"] >= cutoff_time]
+
+
+def load_existing_data_if_available():
+    """
+    Loads existing data into memory from the persistent file and trims old rows.
+    """
+    global _data
+    if not os.path.exists(DATA_FILE):
+        make_new_file_if_needed()
+
+    _data = pd.read_csv(DATA_FILE, parse_dates=["timestamp"])
+    print(f"[INFO] Loaded existing data: {_data.shape[0]} rows from {DATA_FILE}")
+    delete_old_prices()
+    
+    
+load_existing_data_if_available()
 
 
 def store_prices_and_save_file(prices: Dict[str, float]):
@@ -80,10 +81,21 @@ def store_prices_and_save_file(prices: Dict[str, float]):
 
 
 def get_prices(symbol: str, from_ts: datetime, to_ts: datetime) -> pd.DataFrame:
-    """
-    Returns price records for a specific stock in the given time range.
-    """
     global _data
+
+    # Lazy load if needed
+    if _data is None:
+        print("[INFO] _data is None — loading from disk.")
+        load_existing_data_if_available()
+    
+    # If still empty, fetch once and reload
+    if _data.empty:
+        print("[INFO] Data is empty. Triggering fetch and retrying.")
+        from app.data.fetcher import fetch_and_store_stock_prices
+        fetch_and_store_stock_prices()
+        load_existing_data_if_available()
+
+    # Now filter and return the data
     return _data[
         (_data["symbol"] == symbol) &
         (_data["timestamp"] >= from_ts) &

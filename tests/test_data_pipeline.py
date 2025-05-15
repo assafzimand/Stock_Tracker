@@ -6,12 +6,12 @@ def test_data_pipeline():
     print("📦 Loading existing data (if any)...")
     load_existing_data_if_available()
 
-    print("⏱️ Starting scheduler (should run every ~12s)...")
+    print("⏱️ Starting scheduler (should run every ~1 minute)...")
     start_scheduler()
 
     print("🔄 Running for 2.5 minutes to simulate fast data pipeline...")
     try:
-        time.sleep(300)  # 2.5 minutes
+        time.sleep(72000)  # 2.5 minutes
     except KeyboardInterrupt:
         print("\n⛔ Interrupted by user.")
 
