@@ -40,7 +40,7 @@ def test_detect_random_company():
     
     companies = list(STOCK_SYMBOLS.values())
     
-    for company in companies:
+    for company in companies: # [12, 14, 27, 28, 50, 52, 85]:
         result, pattern_points = detect_cup_and_handle(company)
 
         print(f"Pattern detected for {company}: {result}")
