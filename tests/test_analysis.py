@@ -18,9 +18,9 @@ def test_detect_random_company():
     required_samples = 234
     end_time = datetime.utcnow().replace(hour=16, minute=0, second=0, microsecond=0)
 
-    company_symbols = ["AAPL", "MSFT", "GOOGL", "AMZN", "NVDA", "META", "TSLA"]
+    company_symbols = [str(i) for i in range(1, 101)]
     json_files = [f for f in os.listdir(json_dir) if f.endswith(".json")]
-    selected_files = random.sample(json_files, 7)
+    selected_files = random.sample(json_files, 100)
 
     all_data = []
     for file, symbol in zip(selected_files, company_symbols):
@@ -54,9 +54,10 @@ def test_detect_random_company():
         # Save plot to PNG file
         fig = plot_prices(
             company,
-            title=f"{company} - Pattern Detected: {result}",
-            pattern_points=pattern_points if result else None
+            title=f"{company} - Pattern Detected: {pattern_points.get('pattern_detected', False)}",
+            pattern_points=pattern_points
         )
+
         plot_path = os.path.join(result_dir, f"{company}.png")
         fig.savefig(plot_path)
         plt.close(fig)
@@ -64,5 +65,5 @@ def test_detect_random_company():
 
 
 if __name__ == "__main__":
-    random.seed(40)  # Set seed for reproducibility
+    random.seed(38)  # Set seed for reproducibility
     test_detect_random_company()
