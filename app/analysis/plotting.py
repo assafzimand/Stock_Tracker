@@ -61,7 +61,6 @@ def plot_prices(company: str, prices: pd.DataFrame, title: str = None, pattern_p
             if ts is None:
                 continue
 
-            print(f"[DEBUG] Matching timestamp: {ts}")
             closest_idx = prices["timestamp"].sub(ts).abs().idxmin()
 
             if closest_idx in seen_idxs:
@@ -77,7 +76,7 @@ def plot_prices(company: str, prices: pd.DataFrame, title: str = None, pattern_p
 
         if len(overlay_x) >= 2:
             color = "green" if pattern_points.get("pattern_detected") else "red"
-            plt.plot(overlay_x, overlay_y, label="Detected Pattern",
+            plt.plot(overlay_x, overlay_y, label="Detected Pattern" if pattern_points.get("pattern_detected") else "No Pattern, Suspected False Positive",
                      color=color, linestyle="-", linewidth=2, marker='o')
 
     plt.title(title or f"{company} - Last {DATA_RETENTION_DAYS} Days")

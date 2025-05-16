@@ -40,7 +40,7 @@ def test_detect_random_company():
     
     companies = list(STOCK_SYMBOLS.values())
     
-    for company in companies: # [12, 14, 27, 28, 50, 52, 85]:
+    for company in companies: #[27, 45, 46, 50, 56, 57, 85]:
         result, pattern_points, prices = detect_cup_and_handle(company)
 
         print(f"Pattern detected for {company}: {result}")
@@ -66,5 +66,5 @@ def test_detect_random_company():
 
 
 if __name__ == "__main__":
-    random.seed(38)  # Set seed for reproducibility
+    random.seed(30)  # Set seed for reproducibility
     test_detect_random_company()
