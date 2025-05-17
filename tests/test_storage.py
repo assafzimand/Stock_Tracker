@@ -1,6 +1,5 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import random
-import time
 
 from app.data.storage import (
     load_existing_data_if_available,
@@ -45,7 +44,7 @@ def test_query():
     Test querying recent data for each ticker.
     """
     print("🔍 Testing query on recent data...")
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
     one_hour_ago = now - timedelta(hours=1)
 
     for ticker in STOCK_SYMBOLS:

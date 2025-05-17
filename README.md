@@ -8,6 +8,11 @@ The README includes full setup instructions, API usage examples, expected respon
 
 For any questions, issues, or feedback, please contact Assaf Zimand via GitHub or email - assafzimand@gmail.com
 
+## Requirements
+
+- Python 3.10
+- pip 25.1.1
+
 ## 🧰 Setup Instructions
 
 ### 1. Clone the Repository
@@ -53,6 +58,13 @@ http://127.0.0.1:8000/docs
 ```
 
 Use the `/detect-pattern` endpoint to check for a **cup and handle** pattern.
+
+To use this endpoint:
+1. Click "Post".
+2. Click "Try it out".
+3. Adjust the input as you wish within the constraints.
+4. Click "Execute".
+5. The output will be displayed below.
 
 ### Request Body Example:
 ```json

@@ -2,7 +2,6 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 from datetime import datetime, time, timezone
 from zoneinfo import ZoneInfo
-import pytz
 import atexit
 import logging
 
