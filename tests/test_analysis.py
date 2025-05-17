@@ -1,7 +1,7 @@
 import os
 import json
 import random
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -27,7 +27,7 @@ def test_detect_random_company():
 
     # Define the number of samples and the end time for data generation
     required_samples = 234
-    end_time = datetime.utcnow().replace(
+    end_time = datetime.now(timezone.utc).replace(
         hour=16, minute=0, second=0, microsecond=0
     )
 
@@ -74,7 +74,7 @@ def test_detect_random_company():
 
             # Create result directory once
             if 'result_dir' not in locals():
-                timestamp = datetime.utcnow().strftime("%Y-%m-%d_%H-%M-%S")
+                timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%d_%H-%M-%S")
                 result_dir = os.path.join(
                     os.path.dirname(__file__), "test_results", timestamp
                 )
