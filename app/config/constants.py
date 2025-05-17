@@ -1,14 +1,14 @@
 # Dict of ticker symbols to company names
-# STOCK_SYMBOLS = {
-#     "AAPL": "Apple",
-#     "MSFT": "Microsoft",
-#     "GOOGL": "Alphabet",
-#     "AMZN": "Amazon",
-#     "NVDA": "Nvidia",
-#     "META": "Meta",
-#     "TSLA": "Tesla",
-# }
-STOCK_SYMBOLS = {i: i for i in range(1, 101)}
+STOCK_SYMBOLS = {
+    "AAPL": "Apple",
+    "MSFT": "Microsoft",
+    "GOOGL": "Alphabet",
+    "AMZN": "Amazon",
+    "NVDA": "Nvidia",
+    "META": "Meta",
+    "TSLA": "Tesla",
+}
+# STOCK_SYMBOLS = {i: i for i in range(1, 101)}
 
 # Constants related to time intervals
 SAMPLE_INTERVAL_MINUTES = 5

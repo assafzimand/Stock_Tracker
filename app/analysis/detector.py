@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from scipy.signal import argrelextrema
 from datetime import datetime, timedelta
 from .preprocessing import smooth_prices
 from .patterns import CUP_AND_HANDLE_CONFIG as CH
@@ -44,18 +45,25 @@ def passes_handle_checks(smoothed: pd.Series, right_rim_idx: int) -> bool:
     if current_price < smoothed.iloc[right_rim_idx] * (1 - CH.breakout_tolerance):
         print("[DEBUG] Right rim test - Breakout condition not met.")
         return False
+    
+    if current_price > smoothed.iloc[right_rim_idx] * (1 + CH.max_breakout_extension_ratio):
+        print("[DEBUG] Right rim test - Breakout extension too large.")
+        return False
 
     handle_section = smoothed.iloc[right_rim_idx:]
     middle_handle = handle_section.iloc[1:-1]
-    handle_avg_ceiling = (smoothed.iloc[right_rim_idx] + current_price) / 2
-    handle_max = middle_handle.max()
+    handle_ceiling = smoothed.iloc[right_rim_idx]
     handle_min = middle_handle.min()
 
-    if handle_max > handle_avg_ceiling * (1 + CH.max_handle_peak_over_ceiling):
-        print("[DEBUG] Right rim test - Handle peak exceeds allowed spike limit.")
-        return False
+    local_maxima_idx = argrelextrema(middle_handle.values, np.greater)[0]
+    if len(local_maxima_idx) > 0:
+        middle_handle_max = middle_handle.iloc[local_maxima_idx].max()
+        if middle_handle_max > handle_ceiling * (1 + CH.max_handle_peak_over_ceiling):
+            print("[DEBUG] Right rim test - Handle peak exceeds allowed spike limit.")
+            return False
 
-    if (handle_avg_ceiling - handle_min) / handle_avg_ceiling < CH.min_handle_depth:
+    if (handle_ceiling - handle_min) / handle_ceiling < CH.min_handle_depth:
+        print(f"[DEBUG] Right rim test - Handle depth too shallow: handle_min: {handle_min}, handle_ceiling: {handle_ceiling}, handle_depth: {(handle_ceiling - handle_min) / handle_ceiling}")
         print("[DEBUG] Right rim test - Handle depth too shallow.")
         return False
 
@@ -66,8 +74,8 @@ def passes_handle_checks(smoothed: pd.Series, right_rim_idx: int) -> bool:
         print("[DEBUG] Right rim test - Handle width out of bounds.")
         return False
     
-    if current_price < (handle_min + (handle_avg_ceiling - handle_min)*CH.min_handle_recovery_ratio):
-        print("[DEBUG] Right rim test - Not enough recovery from handle.")
+    if current_price < (handle_min + (handle_ceiling - handle_min)*CH.min_handle_recovery_ratio):
+        print("[DEBUG] Right rim test - Not enough recovery from handle's minimum.")
         return False
     
     return True
@@ -86,16 +94,19 @@ def validate_full_pattern(smoothed: pd.Series, left_rim_idx: int, right_rim_idx:
         "right_min_idx": handle_section.idxmin()
     }
 
-    rim_avg = (smoothed.iloc[left_rim_idx] + smoothed.iloc[right_rim_idx]) / 2
-    cup_max = middle_cup.max()
-    if cup_max > rim_avg * (1 + CH.max_cup_peak_above_rim):
-        print("[DEBUG] Cup peak exceeds allowed spike limit.")
-        return False, pattern_data
+    cup_ceiling = min(smoothed.iloc[left_rim_idx], smoothed.iloc[right_rim_idx])
+    local_maxima_idx = argrelextrema(middle_cup.values, np.greater)[0]
+    if len(local_maxima_idx) > 0:
+        middle_cup_max = middle_cup.iloc[local_maxima_idx].max()
+        if middle_cup_max > cup_ceiling * (1 + CH.max_cup_peak_above_rim):
+            print(f"[DEBUG] Cup peak exceeds allowed spike limit, ceiling value: {cup_ceiling}, max local peak: {middle_cup_max}")
+            return False, pattern_data
 
     cup_min = middle_cup.min()
     handle_min = middle_handle.min()
 
-    if (rim_avg - cup_min) / rim_avg < CH.min_cup_depth:
+    if (cup_ceiling - cup_min) / cup_ceiling < CH.min_cup_depth:
+        print(f"[DEBUG] Cup depth too shallow: cup_min: {cup_min}, cup_ceiling: {cup_ceiling}, cup_depth: {(cup_ceiling - cup_min) / cup_ceiling}")
         print("[DEBUG] Cup depth too shallow.")
         return False, pattern_data
 
@@ -107,13 +118,14 @@ def validate_full_pattern(smoothed: pd.Series, left_rim_idx: int, right_rim_idx:
         print("[DEBUG] Cup width out of range.")
         return False, pattern_data
 
-    if not (cup_width >= handle_width * CH.cup_handle_width_ratio):
+    if not (CH.min_cup_to_handle_width_ratio <= cup_width / handle_width <= CH.max_cup_to_handle_width_ratio):
         print("[DEBUG] Cup not wide enough relative to handle.")
         return False, pattern_data
 
-    cup_depth = rim_avg - cup_min
-    cup_depth_ratio = cup_depth / rim_avg if rim_avg > 0 else 0
-    handle_depth = (smoothed.iloc[right_rim_idx] + smoothed.iloc[-1]) / 2 - handle_min
+    cup_depth = cup_ceiling - cup_min
+    cup_depth_ratio = cup_depth / cup_ceiling if cup_ceiling > 0 else 0
+    handle_ceiling = smoothed.iloc[right_rim_idx]
+    handle_depth = handle_ceiling - handle_min
     cup_handle_depth_ratio = handle_depth / cup_depth if cup_depth > 0 else 0
 
     if cup_depth_ratio < CH.min_cup_depth or cup_depth_ratio > CH.max_cup_depth:
@@ -131,6 +143,11 @@ def validate_full_pattern(smoothed: pd.Series, left_rim_idx: int, right_rim_idx:
         print("[DEBUG] Cup min position out of range.")
         return False, pattern_data
 
+    avg_cup_value = middle_cup.mean()
+    if (cup_ceiling - avg_cup_value) / cup_ceiling < CH.min_avg_cup_value_vs_ceiling_ratio:
+        print("[DEBUG] Cup depth ratio out of range.")
+        return False, pattern_data
+
     return True, pattern_data
 
 
@@ -138,10 +155,11 @@ def find_next_right_rim(smoothed: pd.Series, start: int) -> int:
     min_right_rim_idx = int(len(smoothed)/2)
     for i in range(start, min_right_rim_idx, -1):
         val = smoothed.iloc[i]
+        print(f"[DEBUG] Value at {i}: {val}")
 
-        window = smoothed.iloc[max(i - 2, 0):min(i + 3, len(smoothed))]
-        if val != window.max():
-            continue
+        # window = smoothed.iloc[max(i - 2, 0):min(i + 3, len(smoothed))]
+        # if val != window.max():
+        #     continue
 
         if not passes_handle_checks(smoothed, i):
             continue

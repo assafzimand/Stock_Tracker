@@ -10,7 +10,7 @@ from app.config.constants import STOCK_SYMBOLS
 
 
 def test_detect_random_company():
-    # === Setup paths relative to this script ===
+    === Setup paths relative to this script ===
     base_dir = os.path.dirname(os.path.abspath(__file__))
     json_dir = os.path.join(base_dir, "..", "app", "data", "synth_data_json", "labels_json")
     output_csv_path = os.path.join(base_dir, "..", "app", "data", "stock_data.csv")
@@ -40,7 +40,7 @@ def test_detect_random_company():
     
     companies = list(STOCK_SYMBOLS.values())
     
-    for company in companies: #[27, 45, 46, 50, 56, 57, 85]:
+    for company in companies:
         result, pattern_points, prices = detect_cup_and_handle(company)
 
         print(f"Pattern detected for {company}: {result}")
@@ -66,5 +66,5 @@ def test_detect_random_company():
 
 
 if __name__ == "__main__":
-    random.seed(30)  # Set seed for reproducibility
+    random.seed(40)  # Set seed for reproducibility
     test_detect_random_company()
