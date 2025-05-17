@@ -1,14 +1,20 @@
 import yfinance as yf
 from typing import Dict
-from datetime import datetime
+import logging
 
 from app.config.constants import STOCK_SYMBOLS
 from app.data.storage import store_prices_and_save_file  # Assumes a stub exists for now
 
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
+
 
 def get_stock_prices() -> Dict[str, float]:
     """
-    Fetches current stock prices for predefined ticker symbols.
+    Fetch current stock prices for predefined ticker symbols.
 
     Returns:
         Dict[str, float]: Dictionary mapping each ticker to its latest price.
@@ -21,10 +27,9 @@ def get_stock_prices() -> Dict[str, float]:
             if current_price is not None:
                 prices[ticker] = round(current_price, 2)
             else:
-                print(f"[WARN] No price available for {ticker}")
+                logging.warning(f"No price available for {ticker}")
         except Exception as e:
-            print(f"[ERROR] Failed to fetch data for {ticker}: {e}")
-    
+            logging.error(f"Failed to fetch data for {ticker}: {e}")
     return prices
 
 

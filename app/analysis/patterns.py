@@ -1,5 +1,13 @@
 class CupHandleConfig:
-    def __init__(self):
+    """
+    Configuration for detecting the 'cup and handle' pattern.
+
+    This class holds various constants that define the parameters and
+    tolerances used in the detection of the 'cup and handle' pattern in
+    stock prices.
+    """
+
+    def __init__(self) -> None:
         self.cup_width_min_ratio = 0.07
         self.cup_width_max_ratio = 0.8
 

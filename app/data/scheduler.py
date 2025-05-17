@@ -1,20 +1,32 @@
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
-from datetime import datetime, time
+from datetime import datetime, time, timezone
+from zoneinfo import ZoneInfo
 import pytz
 import atexit
+import logging
 
 from app.data.fetcher import fetch_and_store_stock_prices
 from app.config.constants import SAMPLE_INTERVAL_MINUTES
 
 # U.S. Eastern timezone
-EASTERN = pytz.timezone("US/Eastern")
+EASTERN = ZoneInfo("America/New_York")
 
 scheduler = BackgroundScheduler()
 
+# Configure logging
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s - %(levelname)s - %(message)s')
+
 def is_trading_hours(now: datetime) -> bool:
     """
-    Returns True if current time is within trading hours (9:30–16:00 ET on weekdays).
+    Determine if the current time is within trading hours (9:30–16:00 ET on weekdays).
+
+    Args:
+        now (datetime): The current datetime in UTC.
+
+    Returns:
+        bool: True if within trading hours, False otherwise.
     """
     now_et = now.astimezone(EASTERN)
 
@@ -27,19 +39,19 @@ def is_trading_hours(now: datetime) -> bool:
 
 def _scheduled_job():
     """
-    Called every 5 minutes during the scheduler window.
-    Executes fetch only if current time is within market hours.
+    Execute the fetch job every 5 minutes during the scheduler window.
+    Fetches stock prices only if the current time is within market hours.
     """
-    now = datetime.now(pytz.utc)
+    now = datetime.now(timezone.utc)
     if is_trading_hours(now):
-        print(f"[INFO] Running fetch at {now.isoformat()}")
+        logging.info(f"Running fetch at {now.isoformat()}")
         fetch_and_store_stock_prices()
     else:
-        print(f"[SKIP] Outside market hours: {now.isoformat()}")
+        logging.info(f"Outside market hours: {now.isoformat()}")
 
 def start_scheduler():
     """
-    Starts the scheduler to run every N minutes, Mon–Fri, 9:00–16:30 ET.
+    Start the scheduler to run every N minutes, Mon–Fri, 9:00–16:30 ET.
     """
     trigger = CronTrigger(
         day_of_week='mon-fri',
@@ -55,14 +67,17 @@ def start_scheduler():
         replace_existing=True
     )
     scheduler.start()
-    print("[INFO] Scheduler started.")
+    logging.info("Scheduler started.")
 
     atexit.register(stop_scheduler)
 
 def stop_scheduler():
+    """
+    Stop the scheduler if it is running.
+    """
     if scheduler.running:
         scheduler.shutdown()
-        print("[INFO] Scheduler stopped.")
+        logging.info("Scheduler stopped.")
     else:
-        print("[INFO] Scheduler was not running.")
+        logging.info("Scheduler was not running.")
 

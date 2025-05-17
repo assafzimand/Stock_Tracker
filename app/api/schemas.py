@@ -1,3 +1,11 @@
+"""
+This module defines the request and response schemas for the API.
+
+Classes:
+    PatternRequest: Schema for the pattern detection request.
+    PatternResponse: Schema for the pattern detection response.
+"""
+
 from pydantic import BaseModel, Field
 from typing import Optional
 

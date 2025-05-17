@@ -1,3 +1,14 @@
+"""
+This module defines constants used throughout the stock tracking application.
+
+Constants:
+- STOCK_SYMBOLS: A dictionary mapping stock ticker symbols to company names.
+- SAMPLE_INTERVAL_MINUTES: The interval in minutes for sampling stock prices.
+- DATA_RETENTION_DAYS: The number of days to retain stock price data.
+- SAMPLES_PER_DAY: The number of samples per day based on trading hours.
+- MAX_SAMPLES: The maximum number of samples to store per stock.
+"""
+
 # Dict of ticker symbols to company names
 STOCK_SYMBOLS = {
     "AAPL": "Apple",
@@ -8,7 +19,6 @@ STOCK_SYMBOLS = {
     "META": "Meta",
     "TSLA": "Tesla",
 }
-# STOCK_SYMBOLS = {i: i for i in range(1, 101)}
 
 # Constants related to time intervals
 SAMPLE_INTERVAL_MINUTES = 5

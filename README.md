@@ -1,4 +1,3 @@
-
 # Stock Pattern Detection POC
 
 # Project Description
@@ -102,13 +101,22 @@ This saves the plot as `plot.png` on your machine.
 
 ---
 
+## 🛠️ Logging and Debugging
+
+The application uses logging to provide insights into its operation and to facilitate debugging. Logs are configured to display messages at the INFO level and above, and they include timestamps and message levels for clarity. Specific errors and warnings are logged to help diagnose issues during data fetching, pattern detection, and plotting.
+
+---
+
 ## ⚠️ Errors You Might See
 
 | Status | Message | What It Means |
 |--------|---------|----------------|
-| 400 | "As for now, there is not enough data to analyze a pattern for company: Apple" | Not enough data was collected yet |
-| 400 | "company: value is not a valid enumeration member" | Company name is invalid — must be one of the 7 |
-| 422 | "Unprocessable Entity" | Request body is malformed (e.g., wrong JSON format) |
+| 400 | "Invalid company name or symbol provided." | The company name or symbol in the request is not recognized. |
+| 400 | "Invalid value for include_plot. Use 'true' or 'false'." | The include_plot field must be a boolean value. |
+| 400 | "Not enough data to analyze pattern for company: {company}" | Insufficient data is available to perform pattern analysis. |
+| 400 | "Not enough data to generate plot for company: {company}" | Insufficient data is available to generate a plot. |
+| 422 | "Unprocessable Entity" | Request body is malformed (e.g., wrong JSON format). |
+| 500 | "Internal Server Error" | An unexpected error occurred on the server. |
 
 ---
 
@@ -117,7 +125,7 @@ This saves the plot as `plot.png` on your machine.
 Press `CTRL+C` in the terminal to stop the server.  
 The app will gracefully shut down the background scheduler.
 
-You’ll see:
+You'll see:
 ```
 [INFO] Scheduler stopped.
 INFO:     Application shutdown complete.
@@ -131,5 +139,11 @@ Here are sample plots of detected patterns:
 
 | Pattern Not Detected | Pattern Detected |
 |----------------------|------------------|
-| ![79](./app/docs/78.png) | ![87](./app/docs/87.png) |
-| ![91](./app/docs/79.png) | ![80](./app/docs/80.png) |
+| ![149](./app/docs/149.png) | ![206](./app/docs/206.png) |
+| ![172](./app/docs/172.png) | ![796](./app/docs/796.png) |
+
+## 📊 Initial Data Note
+
+The initial data provided with this repository is perturbed real data from the time window of 14th to 17th of May 2025. It has been modified for demonstration and testing purposes.
+
+---
