@@ -8,6 +8,11 @@ The README includes full setup instructions, API usage examples, expected respon
 
 For any questions, issues, or feedback, please contact Assaf Zimand via GitHub or email - assafzimand@gmail.com
 
+## Requirements
+
+- Python 3.10
+- pip 25.1.1
+
 ## 🧰 Setup Instructions
 
 ### 1. Clone the Repository
