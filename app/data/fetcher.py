@@ -1,7 +1,7 @@
 import yfinance as yf
 from typing import Dict
 import logging
-
+from datetime import datetime, timezone
 from app.config.constants import STOCK_SYMBOLS
 from app.data.storage import store_prices_and_save_file  # Assumes a stub exists for now
 
@@ -40,4 +40,5 @@ def fetch_and_store_stock_prices() -> None:
     2. Stores them via the storage module.
     """
     prices = get_stock_prices()
-    store_prices_and_save_file(prices)
+    now = datetime.now(timezone.utc).isoformat()
+    store_prices_and_save_file(prices, now)
